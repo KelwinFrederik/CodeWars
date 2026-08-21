@@ -59,9 +59,9 @@ async function renderCurrentSeason(data) {
 async function getPlayerScore(player) {
 
     try {
-
+       
         const response = await fetch(
-            `https://www.codewars.com/api/v1/users/${player.codewarsUsername}`
+            `https://www.codewars.com/api/v1/users/${encodeURIComponent(player.codewarsUsername)}`
         );
 
         if (!response.ok) {
