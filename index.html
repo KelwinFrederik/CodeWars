@@ -13,100 +13,93 @@
         content="Ranking mensal do clan BotosCodeWars"
     >
 
-    <title>BotosCodeWars | Ranking Mensal</title>
+    <meta name="theme-color" content="#0b0d12">
 
-    <link rel="stylesheet" href="style.css">
+    <title>BotosCodeWars</title>
+
+    <link
+        rel="icon"
+        type="image/svg+xml"
+        href="favicon.svg"
+    >
+
+    <link
+        rel="stylesheet"
+        href="style.css"
+    >
 </head>
 
 <body>
 
-    <div class="background-glow background-glow-one"></div>
-    <div class="background-glow background-glow-two"></div>
-
-    <main class="container">
+    <main class="app">
 
         <header class="hero">
 
-            <div class="brand">
-                <div class="brand-icon">⚔️</div>
+            <div class="brand-row">
+
+                <div class="brand-symbol">
+                    &lt;/&gt;
+                </div>
 
                 <div>
-                    <span class="eyebrow">
-                        CODEWARS CLAN
+                    <span class="brand-label">
+                        CLAN
                     </span>
 
                     <h1>BotosCodeWars</h1>
                 </div>
+
             </div>
 
-            <p class="hero-description">
-                Desafie. Evolua. Suba no ranking.
+            <p>
+                Ranking mensal por Honor conquistado
             </p>
 
         </header>
 
 
-        <section class="season-overview">
+        <section class="season-card">
 
-            <div class="season-header">
+            <div class="season-top">
 
                 <div>
                     <span class="section-label">
                         TEMPORADA ATUAL
                     </span>
 
-                    <h2 id="season-title">
-                        Ranking mensal
-                    </h2>
-
-                    <p id="season-period">
-                        Carregando período...
-                    </p>
+                    <strong id="season-period">
+                        Carregando...
+                    </strong>
                 </div>
 
                 <button
                     id="refresh-button"
-                    class="refresh-button"
+                    class="icon-button"
                     type="button"
                     aria-label="Atualizar ranking"
+                    title="Atualizar ranking"
                 >
-                    <span class="refresh-icon">↻</span>
-                    Atualizar
+                    ↻
                 </button>
 
             </div>
 
 
-            <div class="stats">
+            <div class="season-stats">
 
-                <div class="stat">
-                    <span class="stat-label">
-                        Participantes
-                    </span>
-
-                    <strong id="participants-count">
-                        -
-                    </strong>
+                <div>
+                    <span>Jogadores</span>
+                    <strong id="participants-count">-</strong>
                 </div>
 
-                <div class="stat">
-                    <span class="stat-label">
-                        Líder
-                    </span>
-
-                    <strong id="leader-name">
-                        -
-                    </strong>
+                <div>
+                    <span>Líder</span>
+                    <strong id="leader-name">-</strong>
                 </div>
 
-                <div class="stat">
-                    <span class="stat-label">
-                        Termina em
-                    </span>
-
-                    <strong id="days-left">
-                        -
-                    </strong>
+                <div>
+                    <span>Restam</span>
+                    <strong id="days-left">-</strong>
                 </div>
 
             </div>
@@ -116,7 +109,7 @@
 
         <section class="ranking-section">
 
-            <div class="section-heading">
+            <div class="section-header">
 
                 <div>
                     <span class="section-label">
@@ -140,10 +133,9 @@
                 aria-live="polite"
             >
 
-                <div class="skeleton-player"></div>
-                <div class="skeleton-player"></div>
-                <div class="skeleton-player"></div>
-                <div class="skeleton-player"></div>
+                <div class="skeleton"></div>
+                <div class="skeleton"></div>
+                <div class="skeleton"></div>
 
             </div>
 
@@ -158,20 +150,19 @@
                 type="button"
                 aria-expanded="false"
             >
+
                 <div>
                     <span class="section-label">
-                        TEMPORADAS ANTERIORES
+                        TEMPORADAS
                     </span>
 
                     <h2>Histórico</h2>
                 </div>
 
-                <span
-                    id="history-chevron"
-                    class="history-chevron"
-                >
+                <span class="history-arrow">
                     ↓
                 </span>
+
             </button>
 
 
@@ -181,11 +172,7 @@
                 hidden
             >
 
-                <div id="history-list">
-                    <p class="empty-state">
-                        Carregando histórico...
-                    </p>
-                </div>
+                <div id="history-list"></div>
 
             </div>
 
@@ -193,20 +180,7 @@
 
 
         <footer>
-
-            <span>
-                Pontuação =
-                Honor atual − Honor inicial da temporada
-            </span>
-
-            <a
-                href="https://www.codewars.com/"
-                target="_blank"
-                rel="noopener noreferrer"
-            >
-                Codewars ↗
-            </a>
-
+            Honor atual − Honor inicial = pontos do mês
         </footer>
 
     </main>
