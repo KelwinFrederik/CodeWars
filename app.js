@@ -55,18 +55,24 @@ async function loadData() {
 
         if (!response.ok) {
             throw new Error(
-                "Não foi possível carregar os dados da competição."
+                "Não foi possível carregar a competição."
             );
         }
+
 
         const data =
             await response.json();
 
-        renderSeasonInfo(data.current);
+
+        renderSeasonInfo(
+            data.current
+        );
+
 
         await renderCurrentSeason(
             data.current
         );
+
 
         renderHistory(
             data.history
@@ -80,7 +86,6 @@ async function loadData() {
             `
             <div class="error">
                 Não foi possível carregar o ranking.
-                Tente novamente em alguns instantes.
             </div>
             `;
 
@@ -98,25 +103,31 @@ function renderSeasonInfo(current) {
             current.startDate
         );
 
+
     const endDate =
         getSeasonEndDate(
             startDate
         );
+
 
     document.getElementById(
         "season-period"
     ).textContent =
         `${formatDate(startDate)} → ${formatDate(endDate)}`;
 
+
     document.getElementById(
         "participants-count"
     ).textContent =
         current.participants?.length ?? 0;
 
+
     document.getElementById(
         "days-left"
     ).textContent =
-        formatDaysLeft(endDate);
+        formatDaysLeft(
+            endDate
+        );
 }
 
 
@@ -217,14 +228,12 @@ async function getPlayerScore(player) {
         }
 
 
-        const codewarsUser =
+        const user =
             await response.json();
 
 
         const currentHonor =
-            Number(
-                codewarsUser.honor
-            );
+            Number(user.honor);
 
 
         const initialHonor =
@@ -241,9 +250,13 @@ async function getPlayerScore(player) {
             username:
                 player.codewarsUsername,
 
+            currentHonor,
+
             initialHonor,
 
-            currentHonor,
+            kyu:
+                user.ranks?.overall?.name
+                ?? "sem rank",
 
             points:
                 Math.max(
@@ -257,9 +270,7 @@ async function getPlayerScore(player) {
 
     } catch (error) {
 
-        console.error(
-            error
-        );
+        console.error(error);
 
 
         return {
@@ -270,10 +281,8 @@ async function getPlayerScore(player) {
             username:
                 player.codewarsUsername,
 
-            initialHonor:
-                player.initialHonor,
-
-            currentHonor: null,
+            kyu:
+                "indisponível",
 
             points: 0,
 
@@ -297,40 +306,20 @@ function createPlayerHtml(
 
 
     const position =
-        medals[index] ??
-        `${index + 1}º`;
+        medals[index]
+        ?? `${index + 1}º`;
 
 
     const topClass =
-        index < 3
-            ? `player-top-${index + 1}`
+        index === 0
+            ? "player-top-1"
             : "";
 
 
-    const profileUrl =
-        `https://www.codewars.com/users/${encodeURIComponent(
-            player.username
-        )}`;
-
-
-    const honorHtml =
-        player.error
-
-            ? `
-                <span class="player-error">
-                    Falha ao consultar Codewars
-                </span>
-              `
-
-            : `
-                Honor ${formatNumber(
-                    player.currentHonor
-                )}
-                · começou com
-                ${formatNumber(
-                    player.initialHonor
-                )}
-              `;
+    const initials =
+        getInitials(
+            player.name
+        );
 
 
     const points =
@@ -342,41 +331,31 @@ function createPlayerHtml(
 
 
     return `
-        <article
-            class="player ${topClass}"
-        >
+        <article class="player ${topClass}">
 
             <div class="player-position">
                 ${position}
             </div>
 
 
+            <div class="player-avatar">
+                ${escapeHtml(initials)}
+            </div>
+
+
             <div class="player-info">
 
-                <div class="player-name-row">
+                <span class="player-name">
+                    ${escapeHtml(
+                        player.name
+                    )}
+                </span>
 
-                    <span class="player-name">
-                        ${escapeHtml(
-                            player.name
-                        )}
-                    </span>
-
-                    <a
-                        class="profile-link"
-                        href="${profileUrl}"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        title="Abrir perfil no Codewars"
-                    >
-                        perfil ↗
-                    </a>
-
-                </div>
-
-
-                <div class="player-honor">
-                    ${honorHtml}
-                </div>
+                <span class="player-kyu">
+                    ${escapeHtml(
+                        player.kyu
+                    )}
+                </span>
 
             </div>
 
@@ -387,8 +366,8 @@ function createPlayerHtml(
                     ${points}
                 </strong>
 
-                <span class="player-points-label">
-                    pontos
+                <span class="player-score-label">
+                    pts
                 </span>
 
             </div>
@@ -408,7 +387,7 @@ function renderHistory(history) {
         historyElement.innerHTML =
             `
             <div class="empty-state">
-                Nenhuma temporada encerrada ainda.
+                Nenhuma temporada encerrada.
             </div>
             `;
 
@@ -429,22 +408,6 @@ function renderHistory(history) {
 
 function createHistoryHtml(season) {
 
-    const startDate =
-        parseLocalDate(
-            season.startDate
-        );
-
-
-    const endDate =
-        parseLocalDate(
-            season.endDate
-        );
-
-
-    const winner =
-        season.ranking?.[0];
-
-
     const ranking =
         season.ranking
             .map(
@@ -453,17 +416,9 @@ function createHistoryHtml(season) {
                     index
                 ) => {
 
-                    const medals =
-                        [
-                            "🥇",
-                            "🥈",
-                            "🥉"
-                        ];
-
-
                     const position =
-                        medals[index] ??
-                        `${index + 1}º`;
+                        ["🥇", "🥈", "🥉"][index]
+                        ?? `${index + 1}º`;
 
 
                     return `
@@ -471,15 +426,12 @@ function createHistoryHtml(season) {
 
                             <span>
                                 ${position}
-                                ${escapeHtml(
-                                    player.name
-                                )}
+                                ${escapeHtml(player.name)}
                             </span>
 
                             <strong>
-                                ${formatNumber(
-                                    player.points
-                                )} pts
+                                ${formatNumber(player.points)}
+                                pts
                             </strong>
 
                         </div>
@@ -490,52 +442,61 @@ function createHistoryHtml(season) {
 
 
     return `
-        <article class="history-item">
+        <div class="history-item">
 
             <div class="history-title">
-
-                <span>
-                    ${formatDate(
-                        startDate
-                    )}
-                    →
-                    ${formatDate(
-                        endDate
-                    )}
-                </span>
-
-                ${
-                    winner
-                        ? `
-                            <span>
-                                Campeão:
-                                ${escapeHtml(
-                                    winner.name
-                                )}
-                            </span>
-                          `
-                        : ""
-                }
-
+                ${formatDate(
+                    parseLocalDate(
+                        season.startDate
+                    )
+                )}
+                →
+                ${formatDate(
+                    parseLocalDate(
+                        season.endDate
+                    )
+                )}
             </div>
 
             ${ranking}
 
-        </article>
+        </div>
     `;
+}
+
+
+function getInitials(name) {
+
+    const words =
+        String(name)
+            .trim()
+            .split(/\s+/);
+
+
+    if (words.length === 1) {
+
+        return words[0]
+            .substring(0, 2)
+            .toUpperCase();
+    }
+
+
+    return (
+        words[0][0] +
+        words[
+            words.length - 1
+        ][0]
+    ).toUpperCase();
 }
 
 
 function getSeasonEndDate(startDate) {
 
-    const endDate =
-        new Date(
-            startDate.getFullYear(),
-            startDate.getMonth() + 1,
-            20
-        );
-
-    return endDate;
+    return new Date(
+        startDate.getFullYear(),
+        startDate.getMonth() + 1,
+        20
+    );
 }
 
 
@@ -543,6 +504,7 @@ function formatDaysLeft(endDate) {
 
     const today =
         new Date();
+
 
     today.setHours(
         0,
@@ -557,6 +519,7 @@ function formatDaysLeft(endDate) {
             endDate
         );
 
+
     target.setHours(
         23,
         59,
@@ -565,16 +528,15 @@ function formatDaysLeft(endDate) {
     );
 
 
-    const difference =
-        target -
-        today;
-
-
     const days =
         Math.max(
             0,
             Math.ceil(
-                difference /
+                (
+                    target -
+                    today
+                )
+                /
                 86400000
             )
         );
@@ -617,8 +579,7 @@ function formatDate(date) {
             "pt-BR",
             {
                 day: "2-digit",
-                month: "2-digit",
-                year: "numeric"
+                month: "2-digit"
             }
         );
 }
@@ -656,15 +617,6 @@ function setLoading(isLoading) {
         "loading",
         isLoading
     );
-
-
-    if (isLoading) {
-
-        document.getElementById(
-            "last-update"
-        ).textContent =
-            "Atualizando...";
-    }
 }
 
 
