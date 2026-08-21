@@ -2,8 +2,8 @@ name: Atualizar Ranking
 
 on:
   schedule:
-    # Todo dia 21 às 03:00 UTC = 00:00 no horário de Brasília
-    - cron: "0 3 21 * *"
+    - cron: "5 0 21 * *"
+      timezone: "America/Sao_Paulo"
 
   workflow_dispatch:
 
