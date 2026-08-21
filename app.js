@@ -1,233 +1,701 @@
-
 const HISTORY_URL = "./historico.json";
 
+const rankingElement =
+    document.getElementById("ranking");
+
+const historyElement =
+    document.getElementById("history-list");
+
+const refreshButton =
+    document.getElementById("refresh-button");
+
+const historyToggle =
+    document.getElementById("history-toggle");
+
+const historyContent =
+    document.getElementById("history-content");
+
+
+refreshButton.addEventListener(
+    "click",
+    loadData
+);
+
+
+historyToggle.addEventListener(
+    "click",
+    () => {
+
+        const expanded =
+            historyToggle.getAttribute(
+                "aria-expanded"
+            ) === "true";
+
+        historyToggle.setAttribute(
+            "aria-expanded",
+            String(!expanded)
+        );
+
+        historyContent.hidden =
+            expanded;
+    }
+);
+
+
 async function loadData() {
+
+    setLoading(true);
+
     try {
-        const response = await fetch(HISTORY_URL);
+
+        const response =
+            await fetch(
+                `${HISTORY_URL}?v=${Date.now()}`
+            );
 
         if (!response.ok) {
-            throw new Error("Não foi possível carregar o histórico.");
+            throw new Error(
+                "Não foi possível carregar os dados da competição."
+            );
         }
 
-        const data = await response.json();
+        const data =
+            await response.json();
 
-        await renderCurrentSeason(data);
-        renderHistory(data);
+        renderSeasonInfo(data.current);
+
+        await renderCurrentSeason(
+            data.current
+        );
+
+        renderHistory(
+            data.history
+        );
 
     } catch (error) {
+
         console.error(error);
 
-        document.getElementById("ranking").innerHTML =
-            `<p class="error">${error.message}</p>`;
+        rankingElement.innerHTML =
+            `
+            <div class="error">
+                Não foi possível carregar o ranking.
+                Tente novamente em alguns instantes.
+            </div>
+            `;
+
+    } finally {
+
+        setLoading(false);
     }
 }
 
 
-async function renderCurrentSeason(data) {
+function renderSeasonInfo(current) {
 
-    const current = data.current;
+    const startDate =
+        parseLocalDate(
+            current.startDate
+        );
 
-    const startDate = new Date(current.startDate);
+    const endDate =
+        getSeasonEndDate(
+            startDate
+        );
 
-    document.getElementById("season-period").textContent =
-        `Início: ${formatDate(startDate)}`;
+    document.getElementById(
+        "season-period"
+    ).textContent =
+        `${formatDate(startDate)} → ${formatDate(endDate)}`;
 
-    const rankingElement = document.getElementById("ranking");
+    document.getElementById(
+        "participants-count"
+    ).textContent =
+        current.participants?.length ?? 0;
 
-    if (!current.participants || current.participants.length === 0) {
+    document.getElementById(
+        "days-left"
+    ).textContent =
+        formatDaysLeft(endDate);
+}
+
+
+async function renderCurrentSeason(current) {
+
+    if (
+        !current.participants ||
+        current.participants.length === 0
+    ) {
+
         rankingElement.innerHTML =
-            `<p class="loading">Nenhum participante cadastrado.</p>`;
+            `
+            <div class="empty-state">
+                Nenhum participante cadastrado.
+            </div>
+            `;
 
         return;
     }
 
-    const players = await Promise.all(
-        current.participants.map(getPlayerScore)
+
+    const players =
+        await Promise.all(
+            current.participants.map(
+                getPlayerScore
+            )
+        );
+
+
+    players.sort(
+        (a, b) => {
+
+            if (a.error && !b.error)
+                return 1;
+
+            if (!a.error && b.error)
+                return -1;
+
+            return (
+                b.points -
+                a.points
+            );
+        }
     );
 
-    players.sort((a, b) => b.points - a.points);
 
-    rankingElement.innerHTML = players
-        .map((player, index) => createPlayerHtml(player, index))
-        .join("");
+    rankingElement.innerHTML =
+        players
+            .map(
+                createPlayerHtml
+            )
+            .join("");
 
-    document.getElementById("last-update").textContent =
-        `Atualizado: ${new Date().toLocaleString("pt-BR")}`;
+
+    const leader =
+        players.find(
+            player =>
+                !player.error
+        );
+
+
+    document.getElementById(
+        "leader-name"
+    ).textContent =
+        leader
+            ? leader.name
+            : "-";
+
+
+    document.getElementById(
+        "last-update"
+    ).textContent =
+        `Atualizado ${formatTime(new Date())}`;
 }
 
 
 async function getPlayerScore(player) {
 
     try {
-       
-        const response = await fetch(
-            `https://www.codewars.com/api/v1/users/${encodeURIComponent(player.codewarsUsername)}`
-        );
+
+        const username =
+            encodeURIComponent(
+                player.codewarsUsername
+            );
+
+
+        const response =
+            await fetch(
+                `https://www.codewars.com/api/v1/users/${username}`
+            );
+
 
         if (!response.ok) {
+
             throw new Error(
-                `Não foi possível consultar ${player.codewarsUsername}`
+                `Erro ao consultar ${player.codewarsUsername}`
             );
         }
 
-        const codewarsUser = await response.json();
 
-        const currentHonor = codewarsUser.honor;
+        const codewarsUser =
+            await response.json();
 
-        const points =
-            currentHonor - player.initialHonor;
+
+        const currentHonor =
+            Number(
+                codewarsUser.honor
+            );
+
+
+        const initialHonor =
+            Number(
+                player.initialHonor
+            );
+
 
         return {
-            name: player.name,
-            username: player.codewarsUsername,
-            initialHonor: player.initialHonor,
-            currentHonor: currentHonor,
-            points: Math.max(0, points)
+
+            name:
+                player.name,
+
+            username:
+                player.codewarsUsername,
+
+            initialHonor,
+
+            currentHonor,
+
+            points:
+                Math.max(
+                    0,
+                    currentHonor -
+                    initialHonor
+                ),
+
+            error: false
         };
 
     } catch (error) {
 
-        console.error(error);
+        console.error(
+            error
+        );
+
 
         return {
-            name: player.name,
-            username: player.codewarsUsername,
-            initialHonor: player.initialHonor,
+
+            name:
+                player.name,
+
+            username:
+                player.codewarsUsername,
+
+            initialHonor:
+                player.initialHonor,
+
             currentHonor: null,
+
             points: 0,
+
             error: true
         };
     }
 }
 
 
-function createPlayerHtml(player, index) {
+function createPlayerHtml(
+    player,
+    index
+) {
 
-    const medals = ["🥇", "🥈", "🥉"];
+    const medals =
+        [
+            "🥇",
+            "🥈",
+            "🥉"
+        ];
+
 
     const position =
-        medals[index] || `${index + 1}º`;
+        medals[index] ??
+        `${index + 1}º`;
 
-    const honorText =
+
+    const topClass =
+        index < 3
+            ? `player-top-${index + 1}`
+            : "";
+
+
+    const profileUrl =
+        `https://www.codewars.com/users/${encodeURIComponent(
+            player.username
+        )}`;
+
+
+    const honorHtml =
         player.error
-            ? "Erro ao consultar Codewars"
-            : `Honor: ${player.currentHonor}`;
+
+            ? `
+                <span class="player-error">
+                    Falha ao consultar Codewars
+                </span>
+              `
+
+            : `
+                Honor ${formatNumber(
+                    player.currentHonor
+                )}
+                · começou com
+                ${formatNumber(
+                    player.initialHonor
+                )}
+              `;
+
+
+    const points =
+        player.error
+            ? "—"
+            : formatNumber(
+                player.points
+            );
+
 
     return `
-        <div class="player">
+        <article
+            class="player ${topClass}"
+        >
 
             <div class="player-position">
                 ${position}
             </div>
 
+
             <div class="player-info">
 
-                <div class="player-name">
-                    ${escapeHtml(player.name)}
+                <div class="player-name-row">
+
+                    <span class="player-name">
+                        ${escapeHtml(
+                            player.name
+                        )}
+                    </span>
+
+                    <a
+                        class="profile-link"
+                        href="${profileUrl}"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        title="Abrir perfil no Codewars"
+                    >
+                        perfil ↗
+                    </a>
+
                 </div>
+
 
                 <div class="player-honor">
-                    ${honorText}
+                    ${honorHtml}
                 </div>
 
             </div>
 
-            <div class="player-points">
-                ${player.points} pts
+
+            <div class="player-score">
+
+                <strong class="player-points">
+                    ${points}
+                </strong>
+
+                <span class="player-points-label">
+                    pontos
+                </span>
+
             </div>
 
-        </div>
+        </article>
     `;
 }
 
 
-function renderHistory(data) {
+function renderHistory(history) {
 
-    const historyElement =
-        document.getElementById("history-list");
-
-    if (!data.history || data.history.length === 0) {
+    if (
+        !history ||
+        history.length === 0
+    ) {
 
         historyElement.innerHTML =
-            `<p class="loading">Nenhuma temporada encerrada.</p>`;
+            `
+            <div class="empty-state">
+                Nenhuma temporada encerrada ainda.
+            </div>
+            `;
 
         return;
     }
 
-    historyElement.innerHTML = data.history
-        .slice()
-        .reverse()
-        .map(createHistoryHtml)
-        .join("");
+
+    historyElement.innerHTML =
+        history
+            .slice()
+            .reverse()
+            .map(
+                createHistoryHtml
+            )
+            .join("");
 }
 
 
 function createHistoryHtml(season) {
 
     const startDate =
-        formatDate(new Date(season.startDate));
+        parseLocalDate(
+            season.startDate
+        );
+
 
     const endDate =
-        formatDate(new Date(season.endDate));
+        parseLocalDate(
+            season.endDate
+        );
 
-    const ranking = season.ranking
-        .map((player, index) => {
 
-            const medals = ["🥇", "🥈", "🥉"];
+    const winner =
+        season.ranking?.[0];
 
-            const position =
-                medals[index] || `${index + 1}º`;
 
-            return `
-                <div class="history-player">
-                    <span>
-                        ${position}
-                        ${escapeHtml(player.name)}
-                    </span>
+    const ranking =
+        season.ranking
+            .map(
+                (
+                    player,
+                    index
+                ) => {
 
-                    <strong>
-                        ${player.points} pts
-                    </strong>
-                </div>
-            `;
-        })
-        .join("");
+                    const medals =
+                        [
+                            "🥇",
+                            "🥈",
+                            "🥉"
+                        ];
+
+
+                    const position =
+                        medals[index] ??
+                        `${index + 1}º`;
+
+
+                    return `
+                        <div class="history-player">
+
+                            <span>
+                                ${position}
+                                ${escapeHtml(
+                                    player.name
+                                )}
+                            </span>
+
+                            <strong>
+                                ${formatNumber(
+                                    player.points
+                                )} pts
+                            </strong>
+
+                        </div>
+                    `;
+                }
+            )
+            .join("");
+
 
     return `
-        <div class="history-item">
+        <article class="history-item">
 
             <div class="history-title">
-                ${startDate} → ${endDate}
+
+                <span>
+                    ${formatDate(
+                        startDate
+                    )}
+                    →
+                    ${formatDate(
+                        endDate
+                    )}
+                </span>
+
+                ${
+                    winner
+                        ? `
+                            <span>
+                                Campeão:
+                                ${escapeHtml(
+                                    winner.name
+                                )}
+                            </span>
+                          `
+                        : ""
+                }
+
             </div>
 
             ${ranking}
 
-        </div>
+        </article>
     `;
+}
+
+
+function getSeasonEndDate(startDate) {
+
+    const endDate =
+        new Date(
+            startDate.getFullYear(),
+            startDate.getMonth() + 1,
+            20
+        );
+
+    return endDate;
+}
+
+
+function formatDaysLeft(endDate) {
+
+    const today =
+        new Date();
+
+    today.setHours(
+        0,
+        0,
+        0,
+        0
+    );
+
+
+    const target =
+        new Date(
+            endDate
+        );
+
+    target.setHours(
+        23,
+        59,
+        59,
+        999
+    );
+
+
+    const difference =
+        target -
+        today;
+
+
+    const days =
+        Math.max(
+            0,
+            Math.ceil(
+                difference /
+                86400000
+            )
+        );
+
+
+    if (days === 0)
+        return "hoje";
+
+    if (days === 1)
+        return "1 dia";
+
+    return `${days} dias`;
+}
+
+
+function parseLocalDate(value) {
+
+    const [
+        year,
+        month,
+        day
+    ] =
+        value
+            .split("-")
+            .map(Number);
+
+
+    return new Date(
+        year,
+        month - 1,
+        day
+    );
 }
 
 
 function formatDate(date) {
 
-    return date.toLocaleDateString(
-        "pt-BR",
-        {
-            day: "2-digit",
-            month: "2-digit",
-            year: "numeric"
-        }
+    return date
+        .toLocaleDateString(
+            "pt-BR",
+            {
+                day: "2-digit",
+                month: "2-digit",
+                year: "numeric"
+            }
+        );
+}
+
+
+function formatTime(date) {
+
+    return date
+        .toLocaleTimeString(
+            "pt-BR",
+            {
+                hour: "2-digit",
+                minute: "2-digit"
+            }
+        );
+}
+
+
+function formatNumber(value) {
+
+    return Number(value)
+        .toLocaleString(
+            "pt-BR"
+        );
+}
+
+
+function setLoading(isLoading) {
+
+    refreshButton.disabled =
+        isLoading;
+
+
+    refreshButton.classList.toggle(
+        "loading",
+        isLoading
     );
+
+
+    if (isLoading) {
+
+        document.getElementById(
+            "last-update"
+        ).textContent =
+            "Atualizando...";
+    }
 }
 
 
 function escapeHtml(value) {
 
     return String(value)
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#039;");
+
+        .replaceAll(
+            "&",
+            "&amp;"
+        )
+
+        .replaceAll(
+            "<",
+            "&lt;"
+        )
+
+        .replaceAll(
+            ">",
+            "&gt;"
+        )
+
+        .replaceAll(
+            '"',
+            "&quot;"
+        )
+
+        .replaceAll(
+            "'",
+            "&#039;"
+        );
 }
 
 
