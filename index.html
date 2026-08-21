@@ -2,50 +2,215 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>BotosCodeWars</title>
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <meta
+        name="description"
+        content="Ranking mensal do clan BotosCodeWars"
+    >
+
+    <title>BotosCodeWars | Ranking Mensal</title>
 
     <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
+    <div class="background-glow background-glow-one"></div>
+    <div class="background-glow background-glow-two"></div>
+
     <main class="container">
 
-        <header>
-            <h1>🏆 BotosCodeWars</h1>
-            <p>Competição mensal de Honor no Codewars</p>
+        <header class="hero">
+
+            <div class="brand">
+                <div class="brand-icon">⚔️</div>
+
+                <div>
+                    <span class="eyebrow">
+                        CODEWARS CLAN
+                    </span>
+
+                    <h1>BotosCodeWars</h1>
+                </div>
+            </div>
+
+            <p class="hero-description">
+                Desafie. Evolua. Suba no ranking.
+            </p>
+
         </header>
 
-        <section class="current-season">
 
-            <div class="section-header">
+        <section class="season-overview">
+
+            <div class="season-header">
+
                 <div>
-                    <h2>Temporada atual</h2>
-                    <span id="season-period"></span>
+                    <span class="section-label">
+                        TEMPORADA ATUAL
+                    </span>
+
+                    <h2 id="season-title">
+                        Ranking mensal
+                    </h2>
+
+                    <p id="season-period">
+                        Carregando período...
+                    </p>
                 </div>
 
-                <span id="last-update" class="update"></span>
+                <button
+                    id="refresh-button"
+                    class="refresh-button"
+                    type="button"
+                    aria-label="Atualizar ranking"
+                >
+                    <span class="refresh-icon">↻</span>
+                    Atualizar
+                </button>
+
             </div>
 
-            <div id="ranking" class="ranking">
-                <p class="loading">Carregando ranking...</p>
+
+            <div class="stats">
+
+                <div class="stat">
+                    <span class="stat-label">
+                        Participantes
+                    </span>
+
+                    <strong id="participants-count">
+                        -
+                    </strong>
+                </div>
+
+                <div class="stat">
+                    <span class="stat-label">
+                        Líder
+                    </span>
+
+                    <strong id="leader-name">
+                        -
+                    </strong>
+                </div>
+
+                <div class="stat">
+                    <span class="stat-label">
+                        Termina em
+                    </span>
+
+                    <strong id="days-left">
+                        -
+                    </strong>
+                </div>
+
             </div>
 
         </section>
 
-        <section class="history">
 
-            <h2>📜 Histórico</h2>
+        <section class="ranking-section">
 
-            <div id="history-list">
-                <p class="loading">Carregando histórico...</p>
+            <div class="section-heading">
+
+                <div>
+                    <span class="section-label">
+                        CLASSIFICAÇÃO
+                    </span>
+
+                    <h2>Ranking</h2>
+                </div>
+
+                <span
+                    id="last-update"
+                    class="last-update"
+                ></span>
+
+            </div>
+
+
+            <div
+                id="ranking"
+                class="ranking"
+                aria-live="polite"
+            >
+
+                <div class="skeleton-player"></div>
+                <div class="skeleton-player"></div>
+                <div class="skeleton-player"></div>
+                <div class="skeleton-player"></div>
+
             </div>
 
         </section>
+
+
+        <section class="history-section">
+
+            <button
+                id="history-toggle"
+                class="history-toggle"
+                type="button"
+                aria-expanded="false"
+            >
+                <div>
+                    <span class="section-label">
+                        TEMPORADAS ANTERIORES
+                    </span>
+
+                    <h2>Histórico</h2>
+                </div>
+
+                <span
+                    id="history-chevron"
+                    class="history-chevron"
+                >
+                    ↓
+                </span>
+            </button>
+
+
+            <div
+                id="history-content"
+                class="history-content"
+                hidden
+            >
+
+                <div id="history-list">
+                    <p class="empty-state">
+                        Carregando histórico...
+                    </p>
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <footer>
+
+            <span>
+                Pontuação =
+                Honor atual − Honor inicial da temporada
+            </span>
+
+            <a
+                href="https://www.codewars.com/"
+                target="_blank"
+                rel="noopener noreferrer"
+            >
+                Codewars ↗
+            </a>
+
+        </footer>
 
     </main>
+
 
     <script src="app.js"></script>
 
