@@ -24,7 +24,9 @@
 }
 
 
-/* RESET */
+/* =========================
+   RESET
+========================= */
 
 * {
     box-sizing: border-box;
@@ -64,7 +66,9 @@ a {
 }
 
 
-/* APP */
+/* =========================
+   APP
+========================= */
 
 .app {
     width: 100%;
@@ -72,14 +76,13 @@ a {
 
     margin: auto;
 
-    padding:
-        24px
-        14px
-        40px;
+    padding: 24px 14px 40px;
 }
 
 
-/* HERO */
+/* =========================
+   HERO
+========================= */
 
 .hero {
     display: flex;
@@ -145,10 +148,7 @@ a {
 }
 
 .hero p {
-    margin:
-        12px
-        0
-        0;
+    margin: 12px 0 0;
 
     color: var(--muted);
 
@@ -156,7 +156,9 @@ a {
 }
 
 
-/* CODEWARS CTA */
+/* =========================
+   CODEWARS BUTTON
+========================= */
 
 .codewars-button {
     display: inline-flex;
@@ -169,9 +171,7 @@ a {
 
     margin-top: 16px;
 
-    padding:
-        0
-        16px;
+    padding: 0 16px;
 
     background:
         linear-gradient(
@@ -220,14 +220,14 @@ a {
 }
 
 .codewars-button:focus-visible {
-    outline:
-        2px solid var(--primary);
-
+    outline: 2px solid var(--primary);
     outline-offset: 3px;
 }
 
 
-/* SECTIONS */
+/* =========================
+   SECTIONS
+========================= */
 
 section {
     margin-bottom: 14px;
@@ -247,7 +247,9 @@ section {
 }
 
 
-/* TEMPORADA */
+/* =========================
+   TEMPORADA
+========================= */
 
 .season-card {
     padding: 16px;
@@ -269,6 +271,11 @@ section {
 
     font-size: 0.95rem;
 }
+
+
+/* =========================
+   REFRESH
+========================= */
 
 .icon-button {
     display: grid;
@@ -308,9 +315,7 @@ section {
 }
 
 .icon-button:focus-visible {
-    outline:
-        2px solid var(--primary);
-
+    outline: 2px solid var(--primary);
     outline-offset: 2px;
 }
 
@@ -329,7 +334,9 @@ section {
 }
 
 
-/* STATUS */
+/* =========================
+   STATS
+========================= */
 
 .season-stats {
     display: grid;
@@ -376,7 +383,9 @@ section {
 }
 
 
-/* RANKING */
+/* =========================
+   RANKING
+========================= */
 
 .ranking-section {
     padding: 16px;
@@ -395,10 +404,7 @@ section {
 
 .section-header h2,
 .history-toggle h2 {
-    margin:
-        2px
-        0
-        0;
+    margin: 2px 0 0;
 
     font-size: 1.25rem;
 
@@ -415,20 +421,21 @@ section {
 
 .ranking {
     display: flex;
-
     flex-direction: column;
 
     gap: 8px;
 }
 
 
-/* PLAYER */
+/* =========================
+   PLAYER CARD
+========================= */
 
 .player {
     display: grid;
 
     grid-template-columns:
-        34px
+        32px
         42px
         minmax(0, 1fr)
         auto;
@@ -437,11 +444,9 @@ section {
 
     gap: 9px;
 
-    min-height: 64px;
+    min-height: 82px;
 
-    padding:
-        10px
-        11px;
+    padding: 11px;
 
     background: var(--surface-2);
 
@@ -457,37 +462,40 @@ section {
 }
 
 .player:hover {
-    transform: translateY(-1px);
-
     background: var(--surface-3);
 
     border-color: var(--border-hover);
 }
 
+
+/* TOP 3 */
+
 .player-top-1 {
     background:
         linear-gradient(
             90deg,
-            rgba(250, 204, 21, 0.10),
-            var(--surface-2)
+            rgba(250, 204, 21, 0.11),
+            var(--surface-2) 60%
         );
 
     border-color:
-        rgba(250, 204, 21, 0.22);
+        rgba(250, 204, 21, 0.25);
 }
 
 .player-top-2 {
     border-color:
-        rgba(203, 213, 225, 0.14);
+        rgba(203, 213, 225, 0.16);
 }
 
 .player-top-3 {
     border-color:
-        rgba(205, 127, 50, 0.16);
+        rgba(205, 127, 50, 0.18);
 }
 
 
-/* POSITION */
+/* =========================
+   POSITION
+========================= */
 
 .player-position {
     text-align: center;
@@ -497,7 +505,9 @@ section {
 }
 
 
-/* AVATAR INITIAL */
+/* =========================
+   INITIAL
+========================= */
 
 .player-avatar {
     display: grid;
@@ -506,17 +516,21 @@ section {
     width: 40px;
     height: 40px;
 
+    flex: 0 0 auto;
+
     background:
         linear-gradient(
             145deg,
-            #11151d,
-            #0b0d12
+            #151923,
+            #0d1016
         );
 
     border:
         1px solid var(--border);
 
     border-radius: 50%;
+
+    color: var(--text);
 
     font-size: 0.72rem;
     font-weight: 850;
@@ -525,38 +539,133 @@ section {
 }
 
 
-/* PLAYER INFO */
+/* =========================
+   PLAYER INFO
+========================= */
 
 .player-info {
+    min-width: 0;
+}
+
+.player-name-row {
+    display: flex;
+    align-items: center;
+
+    gap: 7px;
+
     min-width: 0;
 }
 
 .player-name {
     display: block;
 
+    min-width: 0;
+
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
 
-    font-size: 0.88rem;
+    color: var(--text);
+
+    font-size: 0.86rem;
     font-weight: 750;
 }
 
-.player-kyu {
-    display: inline-block;
 
-    margin-top: 4px;
+/* PROFILE */
 
-    color: var(--muted);
+.profile-link {
+    flex: 0 0 auto;
 
-    font-size: 0.68rem;
+    color: var(--primary);
+
+    font-size: 0.58rem;
+    font-weight: 700;
+
+    text-decoration: none;
+
+    opacity: 0.85;
+
+    white-space: nowrap;
+
+    transition:
+        opacity 0.15s ease,
+        color 0.15s ease;
+}
+
+.profile-link:hover {
+    color: var(--primary-hover);
+
+    opacity: 1;
 }
 
 
-/* SCORE */
+/* =========================
+   KYU
+========================= */
+
+.player-kyu {
+    display: inline-flex;
+    align-items: center;
+
+    margin-top: 3px;
+
+    padding: 2px 6px;
+
+    background:
+        rgba(255, 255, 255, 0.04);
+
+    border:
+        1px solid var(--border);
+
+    border-radius: 999px;
+
+    color: var(--muted);
+
+    font-size: 0.59rem;
+    font-weight: 700;
+}
+
+
+/* =========================
+   HONOR
+========================= */
+
+.player-honor {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+
+    gap: 4px;
+
+    margin-top: 5px;
+
+    color: var(--muted);
+
+    font-size: 0.58rem;
+
+    line-height: 1.2;
+}
+
+.player-honor strong {
+    color: var(--text);
+
+    font-weight: 700;
+}
+
+.honor-divider {
+    color: var(--muted);
+
+    opacity: 0.45;
+}
+
+
+/* =========================
+   SCORE
+========================= */
 
 .player-score {
-    min-width: 55px;
+    min-width: 52px;
 
     text-align: right;
 }
@@ -566,14 +675,20 @@ section {
 
     color: var(--primary);
 
-    font-size: 1.05rem;
+    font-size: 1.04rem;
     font-weight: 850;
+
+    line-height: 1;
 }
 
 .player-score-label {
+    display: block;
+
+    margin-top: 3px;
+
     color: var(--muted);
 
-    font-size: 0.55rem;
+    font-size: 0.52rem;
 
     text-transform: uppercase;
 
@@ -581,7 +696,24 @@ section {
 }
 
 
-/* HISTORY */
+/* =========================
+   PLAYER ERROR
+========================= */
+
+.player-error {
+    display: block;
+
+    margin-top: 5px;
+
+    color: var(--danger);
+
+    font-size: 0.61rem;
+}
+
+
+/* =========================
+   HISTORY
+========================= */
 
 .history-section {
     overflow: hidden;
@@ -614,8 +746,7 @@ section {
 }
 
 .history-toggle:focus-visible {
-    outline:
-        2px solid var(--primary);
+    outline: 2px solid var(--primary);
 
     outline-offset: -3px;
 }
@@ -632,10 +763,7 @@ section {
 }
 
 .history-content {
-    padding:
-        0
-        16px
-        16px;
+    padding: 0 16px 16px;
 }
 
 .history-item {
@@ -662,11 +790,14 @@ section {
 .history-player {
     display: flex;
 
+    align-items: center;
     justify-content: space-between;
 
     gap: 10px;
 
     padding: 5px 0;
+
+    color: var(--text);
 
     font-size: 0.78rem;
 }
@@ -676,7 +807,9 @@ section {
 }
 
 
-/* STATES */
+/* =========================
+   STATES
+========================= */
 
 .error {
     padding: 18px;
@@ -699,10 +832,12 @@ section {
 }
 
 
-/* SKELETON */
+/* =========================
+   SKELETON
+========================= */
 
 .skeleton {
-    height: 64px;
+    height: 82px;
 
     background:
         linear-gradient(
@@ -734,13 +869,12 @@ section {
 }
 
 
-/* FOOTER */
+/* =========================
+   FOOTER
+========================= */
 
 footer {
-    padding:
-        10px
-        4px
-        0;
+    padding: 10px 4px 0;
 
     color: var(--muted);
 
@@ -750,7 +884,61 @@ footer {
 }
 
 
-/* TABLET / DESKTOP */
+/* =========================
+   TELAS MUITO PEQUENAS
+========================= */
+
+@media (max-width: 380px) {
+
+    .app {
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+
+    .player {
+        grid-template-columns:
+            28px
+            38px
+            minmax(0, 1fr)
+            auto;
+
+        gap: 6px;
+
+        padding: 9px;
+    }
+
+    .player-avatar {
+        width: 36px;
+        height: 36px;
+
+        font-size: 0.65rem;
+    }
+
+    .player-name {
+        font-size: 0.78rem;
+    }
+
+    .profile-link {
+        font-size: 0.54rem;
+    }
+
+    .player-honor {
+        font-size: 0.54rem;
+    }
+
+    .player-score {
+        min-width: 44px;
+    }
+
+    .player-points {
+        font-size: 0.92rem;
+    }
+}
+
+
+/* =========================
+   TABLET / DESKTOP
+========================= */
 
 @media (min-width: 640px) {
 
@@ -772,9 +960,7 @@ footer {
     .codewars-button {
         margin-top: 18px;
 
-        padding:
-            0
-            18px;
+        padding: 0 18px;
     }
 
     .season-card,
@@ -789,27 +975,55 @@ footer {
             minmax(0, 1fr)
             auto;
 
-        min-height: 72px;
+        min-height: 88px;
+
+        gap: 12px;
 
         padding:
-            12px
+            13px
             16px;
     }
 
     .player-avatar {
         width: 44px;
         height: 44px;
+
+        font-size: 0.76rem;
     }
 
     .player-name {
         font-size: 0.96rem;
     }
 
+    .profile-link {
+        font-size: 0.66rem;
+    }
+
     .player-kyu {
-        font-size: 0.72rem;
+        margin-top: 4px;
+
+        font-size: 0.65rem;
+    }
+
+    .player-honor {
+        margin-top: 6px;
+
+        font-size: 0.68rem;
+    }
+
+    .player-score {
+        min-width: 72px;
     }
 
     .player-points {
-        font-size: 1.2rem;
+        font-size: 1.25rem;
+    }
+
+    .player-score-label {
+        font-size: 0.58rem;
+    }
+
+    .skeleton {
+        height: 88px;
     }
 }
