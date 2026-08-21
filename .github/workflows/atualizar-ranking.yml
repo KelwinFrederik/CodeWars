@@ -1,0 +1,41 @@
+name: Atualizar Ranking
+
+on:
+  schedule:
+    # Todo dia 21 às 03:00 UTC = 00:00 no horário de Brasília
+    - cron: "0 3 21 * *"
+
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  atualizar-ranking:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Baixar repositório
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Atualizar ranking
+        run: node scripts/atualizar-ranking.js
+
+      - name: Salvar alterações
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add historico.json
+
+          if git diff --cached --quiet; then
+            echo "Nenhuma alteração para salvar."
+          else
+            git commit -m "chore: atualizar ranking mensal"
+            git push
+          fi
