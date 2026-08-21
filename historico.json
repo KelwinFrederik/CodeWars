@@ -34,5 +34,43 @@
       }
     ]
   },
-  "history": []
+
+  "history": [
+    {
+      "startDate": "2026-08-01",
+      "endDate": "2026-08-20",
+      "ranking": [
+        {
+          "name": "DaviBrum",
+          "username": "DaviBrum",
+          "points": 514
+        },
+        {
+          "name": "KelwinFrederik",
+          "username": "KelwinFrederik",
+          "points": 378
+        },
+        {
+          "name": "IgorGrieder",
+          "username": "IgorGrieder",
+          "points": 311
+        },
+        {
+          "name": "LorrayneAntonielle",
+          "username": "LorrayneAntonielle",
+          "points": 132
+        },
+        {
+          "name": "Iury Silva Taveira",
+          "username": "iurysilvataveira",
+          "points": 80
+        },
+        {
+          "name": "gabrielgoncalvesdev",
+          "username": "gabrielgoncalvesdev",
+          "points": 79
+        }
+      ]
+    }
+  ]
 }
