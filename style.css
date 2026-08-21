@@ -5,11 +5,13 @@
     --surface-3: #1d222d;
 
     --border: rgba(255, 255, 255, 0.08);
+    --border-hover: rgba(255, 255, 255, 0.14);
 
     --text: #f5f7fa;
     --muted: #8891a0;
 
     --primary: #f0b429;
+    --primary-hover: #f6c64c;
     --primary-soft: rgba(240, 180, 41, 0.10);
 
     --gold: #facc15;
@@ -34,7 +36,6 @@ html {
 
 body {
     margin: 0;
-
     min-height: 100vh;
 
     background:
@@ -53,53 +54,15 @@ body {
         BlinkMacSystemFont,
         "Segoe UI",
         sans-serif;
+
+    -webkit-font-smoothing: antialiased;
 }
 
-button {
+button,
+a {
     font: inherit;
 }
-.codewars-button {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
 
-    gap: 8px;
-
-    margin-top: 16px;
-
-    padding: 11px 16px;
-
-    background: var(--primary);
-
-    border: 1px solid var(--primary);
-
-    border-radius: 12px;
-
-    color: #111;
-
-    font-size: 0.82rem;
-    font-weight: 800;
-
-    text-decoration: none;
-
-    transition:
-        transform 0.18s ease,
-        filter 0.18s ease,
-        box-shadow 0.18s ease;
-}
-
-.codewars-button:hover {
-    transform: translateY(-2px);
-
-    filter: brightness(1.08);
-
-    box-shadow:
-        0 8px 24px rgba(240, 180, 41, 0.18);
-}
-
-.codewars-button:active {
-    transform: scale(0.97);
-}
 
 /* APP */
 
@@ -119,12 +82,15 @@ button {
 /* HERO */
 
 .hero {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+
     margin-bottom: 24px;
 }
 
 .brand-row {
     display: flex;
-
     align-items: center;
 
     gap: 12px;
@@ -132,7 +98,6 @@ button {
 
 .brand-symbol {
     display: grid;
-
     place-items: center;
 
     width: 46px;
@@ -191,6 +156,77 @@ button {
 }
 
 
+/* CODEWARS CTA */
+
+.codewars-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 8px;
+
+    min-height: 42px;
+
+    margin-top: 16px;
+
+    padding:
+        0
+        16px;
+
+    background:
+        linear-gradient(
+            135deg,
+            var(--primary),
+            #d99c14
+        );
+
+    border:
+        1px solid rgba(240, 180, 41, 0.8);
+
+    border-radius: 12px;
+
+    color: #111318;
+
+    font-size: 0.82rem;
+    font-weight: 850;
+
+    text-decoration: none;
+
+    box-shadow:
+        0 8px 22px rgba(240, 180, 41, 0.10);
+
+    transition:
+        transform 0.18s ease,
+        background 0.18s ease,
+        box-shadow 0.18s ease;
+}
+
+.codewars-button:hover {
+    transform: translateY(-2px);
+
+    background:
+        linear-gradient(
+            135deg,
+            var(--primary-hover),
+            var(--primary)
+        );
+
+    box-shadow:
+        0 10px 28px rgba(240, 180, 41, 0.18);
+}
+
+.codewars-button:active {
+    transform: scale(0.97);
+}
+
+.codewars-button:focus-visible {
+    outline:
+        2px solid var(--primary);
+
+    outline-offset: 3px;
+}
+
+
 /* SECTIONS */
 
 section {
@@ -236,7 +272,6 @@ section {
 
 .icon-button {
     display: grid;
-
     place-items: center;
 
     width: 40px;
@@ -259,11 +294,24 @@ section {
 
     transition:
         transform 0.2s ease,
-        background 0.2s ease;
+        background 0.2s ease,
+        border-color 0.2s ease;
+}
+
+.icon-button:hover {
+    background: var(--surface-3);
+    border-color: var(--border-hover);
 }
 
 .icon-button:active {
     transform: scale(0.94);
+}
+
+.icon-button:focus-visible {
+    outline:
+        2px solid var(--primary);
+
+    outline-offset: 2px;
 }
 
 .icon-button.loading {
@@ -300,6 +348,9 @@ section {
     padding: 11px;
 
     background: var(--surface-2);
+
+    border:
+        1px solid transparent;
 
     border-radius: 11px;
 }
@@ -398,6 +449,19 @@ section {
         1px solid var(--border);
 
     border-radius: 13px;
+
+    transition:
+        transform 0.16s ease,
+        background 0.16s ease,
+        border-color 0.16s ease;
+}
+
+.player:hover {
+    transform: translateY(-1px);
+
+    background: var(--surface-3);
+
+    border-color: var(--border-hover);
 }
 
 .player-top-1 {
@@ -410,6 +474,16 @@ section {
 
     border-color:
         rgba(250, 204, 21, 0.22);
+}
+
+.player-top-2 {
+    border-color:
+        rgba(203, 213, 225, 0.14);
+}
+
+.player-top-3 {
+    border-color:
+        rgba(205, 127, 50, 0.16);
 }
 
 
@@ -427,13 +501,17 @@ section {
 
 .player-avatar {
     display: grid;
-
     place-items: center;
 
     width: 40px;
     height: 40px;
 
-    background: #0d1016;
+    background:
+        linear-gradient(
+            145deg,
+            #11151d,
+            #0b0d12
+        );
 
     border:
         1px solid var(--border);
@@ -530,6 +608,18 @@ section {
     cursor: pointer;
 }
 
+.history-toggle:hover {
+    background:
+        rgba(255, 255, 255, 0.015);
+}
+
+.history-toggle:focus-visible {
+    outline:
+        2px solid var(--primary);
+
+    outline-offset: -3px;
+}
+
 .history-arrow {
     transition:
         transform
@@ -554,6 +644,9 @@ section {
     margin-top: 8px;
 
     background: var(--surface-2);
+
+    border:
+        1px solid var(--border);
 
     border-radius: 12px;
 }
@@ -666,6 +759,22 @@ footer {
             44px
             20px
             60px;
+    }
+
+    .hero {
+        margin-bottom: 30px;
+    }
+
+    .hero p {
+        font-size: 0.88rem;
+    }
+
+    .codewars-button {
+        margin-top: 18px;
+
+        padding:
+            0
+            18px;
     }
 
     .season-card,
