@@ -1,1 +1,38 @@
-{ "current": { "startDate": "2026-08-21", "participants": [] }, "history": [] }
+{
+  "current": {
+    "startDate": "2026-08-21",
+    "participants": [
+      {
+        "name": "DaviBrum",
+        "codewarsUsername": "DaviBrum",
+        "initialHonor": 514
+      },
+      {
+        "name": "KelwinFrederik",
+        "codewarsUsername": "KelwinFrederik",
+        "initialHonor": 378
+      },
+      {
+        "name": "IgorGrieder",
+        "codewarsUsername": "IgorGrieder",
+        "initialHonor": 311
+      },
+      {
+        "name": "LorrayneAntonielle",
+        "codewarsUsername": "LorrayneAntonielle",
+        "initialHonor": 132
+      },
+      {
+        "name": "Iury Silva Taveira",
+        "codewarsUsername": "iurysilvataveira",
+        "initialHonor": 80
+      },
+      {
+        "name": "gabrielgoncalvesdev",
+        "codewarsUsername": "gabrielgoncalvesdev",
+        "initialHonor": 79
+      }
+    ]
+  },
+  "history": []
+}
