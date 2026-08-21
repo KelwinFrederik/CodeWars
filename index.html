@@ -1,2 +1,53 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<!DOCTYPE html> <html lang="pt-BR"> <head> <meta charset="UTF-8"> <title>BotosCodeWars</title> </head> <body> <h1>🏆 BotosCodeWars</h1> <p>Ranking mensal do time</p> </body> </html>
+    <title>BotosCodeWars</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <main class="container">
+
+        <header>
+            <h1>🏆 BotosCodeWars</h1>
+            <p>Competição mensal de Honor no Codewars</p>
+        </header>
+
+        <section class="current-season">
+
+            <div class="section-header">
+                <div>
+                    <h2>Temporada atual</h2>
+                    <span id="season-period"></span>
+                </div>
+
+                <span id="last-update" class="update"></span>
+            </div>
+
+            <div id="ranking" class="ranking">
+                <p class="loading">Carregando ranking...</p>
+            </div>
+
+        </section>
+
+        <section class="history">
+
+            <h2>📜 Histórico</h2>
+
+            <div id="history-list">
+                <p class="loading">Carregando histórico...</p>
+            </div>
+
+        </section>
+
+    </main>
+
+    <script src="app.js"></script>
+
+</body>
+</html>
