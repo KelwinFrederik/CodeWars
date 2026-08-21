@@ -10,7 +10,7 @@ const HISTORY_FILE = path.join(
 async function getCodewarsHonor(username) {
 
     const url =
-        `https://www.codewars.com/api/v1/users/${username}`;
+         `https://www.codewars.com/api/v1/users/${encodeURIComponent(username)}`;
 
     const response = await fetch(url);
 
