@@ -246,12 +246,10 @@ async function getPlayerScore(player) {
 
             name:
                 player.name,
-
             username:
                 player.codewarsUsername,
 
             currentHonor,
-
             initialHonor,
 
             kyu:
@@ -291,44 +289,81 @@ async function getPlayerScore(player) {
     }
 }
 
-
 function createPlayerHtml(
     player,
     index
 ) {
-
-    const medals =
-        [
-            "🥇",
-            "🥈",
-            "🥉"
-        ];
-
+    const medals = [
+        "🥇",
+        "🥈",
+        "🥉"
+    ];
 
     const position =
-        medals[index]
-        ?? `${index + 1}º`;
-
+        medals[index] ??
+        `${index + 1}º`;
 
     const topClass =
-        index === 0
-            ? "player-top-1"
+        index < 3
+            ? `player-top-${index + 1}`
             : "";
-
 
     const initials =
         getInitials(
             player.name
         );
 
+    const profileUrl =
+        `https://www.codewars.com/users/${encodeURIComponent(
+            player.username
+        )}`;
 
-    const points =
-        player.error
-            ? "—"
-            : formatNumber(
-                player.points
-            );
+    if (player.error) {
+        return `
+            <article class="player ${topClass}">
 
+                <div class="player-position">
+                    ${position}
+                </div>
+
+                <div class="player-avatar">
+                    ${escapeHtml(initials)}
+                </div>
+
+                <div class="player-info">
+
+                    <div class="player-name-row">
+
+                        <span class="player-name">
+                            ${escapeHtml(player.name)}
+                        </span>
+
+                        <a
+                            class="profile-link"
+                            href="${profileUrl}"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                        >
+                            Perfil ↗
+                        </a>
+
+                    </div>
+
+                    <span class="player-error">
+                        Não foi possível consultar o Codewars
+                    </span>
+
+                </div>
+
+                <div class="player-score">
+                    <strong class="player-points">
+                        —
+                    </strong>
+                </div>
+
+            </article>
+        `;
+    }
 
     return `
         <article class="player ${topClass}">
@@ -337,33 +372,62 @@ function createPlayerHtml(
                 ${position}
             </div>
 
-
             <div class="player-avatar">
                 ${escapeHtml(initials)}
             </div>
 
-
             <div class="player-info">
 
-                <span class="player-name">
-                    ${escapeHtml(
-                        player.name
-                    )}
-                </span>
+                <div class="player-name-row">
+
+                    <span class="player-name">
+                        ${escapeHtml(player.name)}
+                    </span>
+
+                    <a
+                        class="profile-link"
+                        href="${profileUrl}"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        title="Abrir perfil no Codewars"
+                    >
+                        Perfil ↗
+                    </a>
+
+                </div>
 
                 <span class="player-kyu">
-                    ${escapeHtml(
-                        player.kyu
-                    )}
+                    ${escapeHtml(player.kyu)}
                 </span>
 
-            </div>
+                <div class="player-honor">
 
+                    <span>
+                        Inicial
+                        <strong>
+                            ${formatNumber(player.initialHonor)}
+                        </strong>
+                    </span>
+
+                    <span class="honor-divider">
+                        •
+                    </span>
+
+                    <span>
+                        Atual
+                        <strong>
+                            ${formatNumber(player.currentHonor)}
+                        </strong>
+                    </span>
+
+                </div>
+
+            </div>
 
             <div class="player-score">
 
                 <strong class="player-points">
-                    ${points}
+                    +${formatNumber(player.points)}
                 </strong>
 
                 <span class="player-score-label">
@@ -375,7 +439,6 @@ function createPlayerHtml(
         </article>
     `;
 }
-
 
 function renderHistory(history) {
 
