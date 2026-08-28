@@ -3,6 +3,9 @@ const HISTORY_URL = "./historico.json";
 const rankingElement =
     document.getElementById("ranking");
 
+const podiumElement =
+    document.getElementById("podium");
+
 const historyElement =
     document.getElementById("history-list");
 
@@ -137,6 +140,8 @@ async function renderCurrentSeason(current) {
         !current.participants ||
         current.participants.length === 0
     ) {
+        podiumElement.innerHTML = "";
+        podiumElement.hidden = true;
 
         rankingElement.innerHTML =
             `
@@ -173,6 +178,7 @@ async function renderCurrentSeason(current) {
         }
     );
 
+    renderPodium(players);
 
     rankingElement.innerHTML =
         players
@@ -287,6 +293,117 @@ async function getPlayerScore(player) {
             error: true
         };
     }
+}
+
+function renderPodium(players) {
+
+    const validPlayers =
+        players
+            .filter(player => !player.error)
+            .slice(0, 3);
+
+
+    if (validPlayers.length === 0) {
+
+        podiumElement.innerHTML = "";
+        podiumElement.hidden = true;
+
+        return;
+    }
+
+
+    podiumElement.hidden = false;
+
+
+    const positions = [
+        {
+            player: validPlayers[1],
+            place: 2
+        },
+        {
+            player: validPlayers[0],
+            place: 1
+        },
+        {
+            player: validPlayers[2],
+            place: 3
+        }
+    ];
+
+
+    podiumElement.innerHTML =
+        positions
+            .filter(item => item.player)
+            .map(
+                ({ player, place }) => {
+
+                    const initials =
+                        getInitials(
+                            player.name
+                        );
+
+
+                    const profileUrl =
+                        `https://www.codewars.com/users/${encodeURIComponent(
+                            player.username
+                        )}`;
+
+
+                    return `
+                        <a
+                            class="podium-player podium-place-${place}"
+                            href="${profileUrl}"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            aria-label="${place}º lugar: ${escapeHtml(player.name)}"
+                        >
+
+                            <div class="podium-person">
+
+                                ${
+                                    place === 1
+                                        ? `
+                                            <div class="podium-crown">
+                                                <span></span>
+                                                <span></span>
+                                                <span></span>
+                                            </div>
+                                        `
+                                        : ""
+                                }
+
+                                <div class="podium-avatar">
+                                    ${escapeHtml(initials)}
+                                </div>
+
+                                <strong class="podium-name">
+                                    ${escapeHtml(player.name)}
+                                </strong>
+
+                                <span class="podium-points">
+                                    +${formatNumber(player.points)} pts
+                                </span>
+
+                            </div>
+
+
+                            <div class="podium-base">
+
+                                <span class="podium-number">
+                                    ${place}
+                                </span>
+
+                                <span class="podium-label">
+                                    lugar
+                                </span>
+
+                            </div>
+
+                        </a>
+                    `;
+                }
+            )
+            .join("");
 }
 
 function createPlayerHtml(
