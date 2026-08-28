@@ -1,49 +1,83 @@
 const HISTORY_URL = "./historico.json";
+const CODEWARS_API_URL = "https://www.codewars.com/api/v1/users";
+const CODEWARS_PROFILE_URL = "https://www.codewars.com/users";
 
-const rankingElement =
-    document.getElementById("ranking");
+const PODIUM_SIZE = 3;
 
-const podiumElement =
-    document.getElementById("podium");
+const elements = {
+    ranking:
+        document.getElementById("ranking"),
 
-const historyElement =
-    document.getElementById("history-list");
+    podium:
+        document.getElementById("podium"),
 
-const refreshButton =
-    document.getElementById("refresh-button");
+    dailyPenaltyHistory:
+        document.getElementById(
+            "daily-penalty-history"
+        ),
 
-const historyToggle =
-    document.getElementById("history-toggle");
+    historyList:
+        document.getElementById("history-list"),
 
-const historyContent =
-    document.getElementById("history-content");
+    refreshButton:
+        document.getElementById("refresh-button"),
+
+    historyToggle:
+        document.getElementById("history-toggle"),
+
+    historyContent:
+        document.getElementById("history-content"),
+
+    seasonPeriod:
+        document.getElementById("season-period"),
+
+    participantsCount:
+        document.getElementById("participants-count"),
+
+    leaderName:
+        document.getElementById("leader-name"),
+
+    daysLeft:
+        document.getElementById("days-left"),
+
+    lastUpdate:
+        document.getElementById("last-update")
+};
 
 
-refreshButton.addEventListener(
+/* =========================
+   EVENTS
+========================= */
+
+elements.refreshButton.addEventListener(
     "click",
     loadData
 );
 
 
-historyToggle.addEventListener(
+elements.historyToggle.addEventListener(
     "click",
-    () => {
-
-        const expanded =
-            historyToggle.getAttribute(
-                "aria-expanded"
-            ) === "true";
-
-        historyToggle.setAttribute(
-            "aria-expanded",
-            String(!expanded)
-        );
-
-        historyContent.hidden =
-            expanded;
-    }
+    toggleHistory
 );
 
+
+function toggleHistory() {
+
+    const isExpanded =
+        elements.historyToggle.getAttribute(
+            "aria-expanded"
+        ) === "true";
+
+
+    elements.historyToggle.setAttribute(
+        "aria-expanded",
+        String(!isExpanded)
+    );
+
+
+    elements.historyContent.hidden =
+        isExpanded;
+}
 
 async function loadData() {
 
@@ -51,20 +85,8 @@ async function loadData() {
 
     try {
 
-        const response =
-            await fetch(
-                `${HISTORY_URL}?v=${Date.now()}`
-            );
-
-        if (!response.ok) {
-            throw new Error(
-                "Não foi possível carregar a competição."
-            );
-        }
-
-
         const data =
-            await response.json();
+            await fetchCompetitionData();
 
 
         renderSeasonInfo(
@@ -73,7 +95,8 @@ async function loadData() {
 
 
         await renderCurrentSeason(
-            data.current
+            data.current,
+            data.history
         );
 
 
@@ -85,12 +108,7 @@ async function loadData() {
 
         console.error(error);
 
-        rankingElement.innerHTML =
-            `
-            <div class="error">
-                Não foi possível carregar o ranking.
-            </div>
-            `;
+        renderLoadError();
 
     } finally {
 
@@ -98,6 +116,41 @@ async function loadData() {
     }
 }
 
+
+async function fetchCompetitionData() {
+
+    const response =
+        await fetch(
+            `${HISTORY_URL}?v=${Date.now()}`
+        );
+
+
+    if (!response.ok) {
+
+        throw new Error(
+            "Não foi possível carregar a competição."
+        );
+    }
+
+
+    return response.json();
+}
+
+
+function renderLoadError() {
+
+    elements.podium.innerHTML = "";
+
+    elements.dailyPenaltyHistory.hidden =
+        true;
+
+
+    elements.ranking.innerHTML = `
+        <div class="error">
+            Não foi possível carregar o ranking.
+        </div>
+    `;
+}
 
 function renderSeasonInfo(current) {
 
@@ -113,100 +166,119 @@ function renderSeasonInfo(current) {
         );
 
 
-    document.getElementById(
-        "season-period"
-    ).textContent =
+    elements.seasonPeriod.textContent =
         `${formatDate(startDate)} → ${formatDate(endDate)}`;
 
 
-    document.getElementById(
-        "participants-count"
-    ).textContent =
+    elements.participantsCount.textContent =
         current.participants?.length ?? 0;
 
 
-    document.getElementById(
-        "days-left"
-    ).textContent =
+    elements.daysLeft.textContent =
         formatDaysLeft(
             endDate
         );
 }
 
+async function renderCurrentSeason(
+    current,
+    history
+) {
 
-async function renderCurrentSeason(current) {
+    renderLastDailyLoser(
+        history
+    );
 
-    if (
-        !current.participants ||
-        current.participants.length === 0
-    ) {
-        podiumElement.innerHTML = "";
-        podiumElement.hidden = true;
 
-        rankingElement.innerHTML =
-            `
-            <div class="empty-state">
-                Nenhum participante cadastrado.
-            </div>
-            `;
+    if (!hasParticipants(current)) {
+
+        renderEmptyRanking();
 
         return;
     }
 
 
     const players =
-        await Promise.all(
-            current.participants.map(
-                getPlayerScore
-            )
+        await loadPlayers(
+            current.participants
         );
 
 
-    players.sort(
-        (a, b) => {
-
-            if (a.error && !b.error)
-                return 1;
-
-            if (!a.error && b.error)
-                return -1;
-
-            return (
-                b.points -
-                a.points
-            );
-        }
+    sortPlayers(
+        players
     );
 
-    renderPodium(players);
 
-    rankingElement.innerHTML =
-        players
-            .map(
-                createPlayerHtml
-            )
-            .join("");
-
-
-    const leader =
-        players.find(
+    const validPlayers =
+        players.filter(
             player =>
                 !player.error
         );
 
 
-    document.getElementById(
-        "leader-name"
-    ).textContent =
-        leader
-            ? leader.name
-            : "-";
+    const podiumPlayers =
+        validPlayers.slice(
+            0,
+            PODIUM_SIZE
+        );
 
 
-    document.getElementById(
-        "last-update"
-    ).textContent =
-        `Atualizado ${formatTime(new Date())}`;
+    const lastPlayer =
+        validPlayers.at(-1);
+
+
+    renderPodium(
+        podiumPlayers
+    );
+
+
+    renderRanking(
+        players,
+        podiumPlayers,
+        lastPlayer
+    );
+
+
+    renderLeader(
+        validPlayers[0]
+    );
+
+
+    renderLastUpdate();
+}
+
+
+function hasParticipants(current) {
+
+    return (
+        current.participants &&
+        current.participants.length > 0
+    );
+}
+
+
+function renderEmptyRanking() {
+
+    elements.podium.innerHTML = "";
+    elements.podium.hidden = true;
+
+    elements.leaderName.textContent = "-";
+
+
+    elements.ranking.innerHTML = `
+        <div class="empty-state">
+            Nenhum participante cadastrado.
+        </div>
+    `;
+}
+
+async function loadPlayers(participants) {
+
+    return Promise.all(
+        participants.map(
+            getPlayerScore
+        )
+    );
 }
 
 
@@ -214,32 +286,16 @@ async function getPlayerScore(player) {
 
     try {
 
-        const username =
-            encodeURIComponent(
+        const user =
+            await fetchCodewarsUser(
                 player.codewarsUsername
             );
 
 
-        const response =
-            await fetch(
-                `https://www.codewars.com/api/v1/users/${username}`
-            );
-
-
-        if (!response.ok) {
-
-            throw new Error(
-                `Erro ao consultar ${player.codewarsUsername}`
-            );
-        }
-
-
-        const user =
-            await response.json();
-
-
         const currentHonor =
-            Number(user.honor);
+            Number(
+                user.honor
+            );
 
 
         const initialHonor =
@@ -249,9 +305,9 @@ async function getPlayerScore(player) {
 
 
         return {
-
             name:
                 player.name,
+
             username:
                 player.codewarsUsername,
 
@@ -269,7 +325,8 @@ async function getPlayerScore(player) {
                     initialHonor
                 ),
 
-            error: false
+            error:
+                false
         };
 
     } catch (error) {
@@ -278,7 +335,6 @@ async function getPlayerScore(player) {
 
 
         return {
-
             name:
                 player.name,
 
@@ -288,205 +344,297 @@ async function getPlayerScore(player) {
             kyu:
                 "indisponível",
 
-            points: 0,
+            points:
+                0,
 
-            error: true
+            error:
+                true
         };
     }
 }
 
+
+async function fetchCodewarsUser(username) {
+
+    const encodedUsername =
+        encodeURIComponent(
+            username
+        );
+
+
+    const response =
+        await fetch(
+            `${CODEWARS_API_URL}/${encodedUsername}`
+        );
+
+
+    if (!response.ok) {
+
+        throw new Error(
+            `Erro ao consultar ${username}`
+        );
+    }
+
+
+    return response.json();
+}
+
+
+function sortPlayers(players) {
+
+    players.sort(
+        (a, b) => {
+
+            if (a.error && !b.error)
+                return 1;
+
+            if (!a.error && b.error)
+                return -1;
+
+            return (
+                b.points -
+                a.points
+            );
+        }
+    );
+}
+
 function renderPodium(players) {
 
-    const validPlayers =
-        players
-            .filter(player => !player.error)
-            .slice(0, 3);
+    if (players.length === 0) {
 
-
-    if (validPlayers.length === 0) {
-
-        podiumElement.innerHTML = "";
-        podiumElement.hidden = true;
+        elements.podium.innerHTML = "";
+        elements.podium.hidden = true;
 
         return;
     }
 
 
-    podiumElement.hidden = false;
+    elements.podium.hidden = false;
 
 
     const positions = [
         {
-            player: validPlayers[1],
-            place: 2
+            player:
+                players[1],
+
+            place:
+                2
         },
         {
-            player: validPlayers[0],
-            place: 1
+            player:
+                players[0],
+
+            place:
+                1
         },
         {
-            player: validPlayers[2],
-            place: 3
+            player:
+                players[2],
+
+            place:
+                3
         }
     ];
 
 
-    podiumElement.innerHTML =
+    elements.podium.innerHTML =
         positions
-            .filter(item => item.player)
+            .filter(
+                item =>
+                    item.player
+            )
             .map(
-                ({ player, place }) => {
-
-                    const initials =
-                        getInitials(
-                            player.name
-                        );
-
-
-                    const profileUrl =
-                        `https://www.codewars.com/users/${encodeURIComponent(
-                            player.username
-                        )}`;
-
-
-                    return `
-                        <a
-                            class="podium-player podium-place-${place}"
-                            href="${profileUrl}"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            aria-label="${place}º lugar: ${escapeHtml(player.name)}"
-                        >
-
-                            <div class="podium-person">
-
-                                ${
-                                    place === 1
-                                        ? `
-                                            <div class="podium-crown">
-                                                <span></span>
-                                                <span></span>
-                                                <span></span>
-                                            </div>
-                                        `
-                                        : ""
-                                }
-
-                                <div class="podium-avatar">
-                                    ${escapeHtml(initials)}
-                                </div>
-
-                                <strong class="podium-name">
-                                    ${escapeHtml(player.name)}
-                                </strong>
-
-                                <span class="podium-points">
-                                    +${formatNumber(player.points)} pts
-                                </span>
-
-                            </div>
-
-
-                            <div class="podium-base">
-
-                                <span class="podium-number">
-                                    ${place}
-                                </span>
-
-                                <span class="podium-label">
-                                    lugar
-                                </span>
-
-                            </div>
-
-                        </a>
-                    `;
-                }
+                createPodiumPlayerHtml
             )
             .join("");
 }
 
-function createPlayerHtml(
+
+function createPodiumPlayerHtml({
     player,
-    index
-) {
-    const medals = [
-        "🥇",
-        "🥈",
-        "🥉"
-    ];
-
-    const position =
-        medals[index] ??
-        `${index + 1}º`;
-
-    const topClass =
-        index < 3
-            ? `player-top-${index + 1}`
-            : "";
+    place
+}) {
 
     const initials =
         getInitials(
             player.name
         );
 
+
     const profileUrl =
-        `https://www.codewars.com/users/${encodeURIComponent(
+        getProfileUrl(
             player.username
-        )}`;
+        );
 
-    if (player.error) {
-        return `
-            <article class="player ${topClass}">
 
-                <div class="player-position">
-                    ${position}
-                </div>
+    const crown =
+        place === 1
+            ? createCrownHtml()
+            : "";
 
-                <div class="player-avatar">
+
+    return `
+        <a
+            class="podium-player podium-place-${place}"
+            href="${profileUrl}"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="${place}º lugar: ${escapeHtml(player.name)}"
+        >
+
+            <div class="podium-person">
+
+                ${crown}
+
+                <div class="podium-avatar">
                     ${escapeHtml(initials)}
                 </div>
 
-                <div class="player-info">
+                <strong class="podium-name">
+                    ${escapeHtml(player.name)}
+                </strong>
 
-                    <div class="player-name-row">
+                <span class="podium-points">
+                    +${formatNumber(player.points)} pts
+                </span>
 
-                        <span class="player-name">
-                            ${escapeHtml(player.name)}
-                        </span>
+            </div>
 
-                        <a
-                            class="profile-link"
-                            href="${profileUrl}"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                        >
-                            Perfil ↗
-                        </a>
+            <div class="podium-base">
 
-                    </div>
+                <span class="podium-number">
+                    ${place}
+                </span>
 
-                    <span class="player-error">
-                        Não foi possível consultar o Codewars
-                    </span>
+                <span class="podium-label">
+                    lugar
+                </span>
 
-                </div>
+            </div>
 
-                <div class="player-score">
-                    <strong class="player-points">
-                        —
-                    </strong>
-                </div>
+        </a>
+    `;
+}
 
-            </article>
-        `;
-    }
+
+function createCrownHtml() {
 
     return `
-        <article class="player ${topClass}">
+        <div
+            class="podium-crown"
+            aria-hidden="true"
+        >
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    `;
+}
+
+
+/* =========================
+   RANKING LIST
+========================= */
+
+function renderRanking(
+    players,
+    podiumPlayers,
+    lastPlayer
+) {
+
+    const podiumUsernames =
+        new Set(
+            podiumPlayers.map(
+                player =>
+                    player.username
+            )
+        );
+
+
+    const remainingPlayers =
+        players.filter(
+            player =>
+                !podiumUsernames.has(
+                    player.username
+                )
+        );
+
+
+    if (remainingPlayers.length === 0) {
+
+        elements.ranking.innerHTML = "";
+
+        return;
+    }
+
+
+    elements.ranking.innerHTML =
+        remainingPlayers
+            .map(
+                player => {
+
+                    const position =
+                        players.indexOf(player) + 1;
+
+
+                    const isLast =
+                        !player.error &&
+                        lastPlayer?.username ===
+                        player.username;
+
+
+                    return createPlayerHtml(
+                        player,
+                        position,
+                        isLast
+                    );
+                }
+            )
+            .join("");
+}
+
+
+function createPlayerHtml(
+    player,
+    position,
+    isLast = false
+) {
+
+    const initials =
+        getInitials(
+            player.name
+        );
+
+
+    const profileUrl =
+        getProfileUrl(
+            player.username
+        );
+
+
+    const lastClass =
+        isLast
+            ? "player-last"
+            : "";
+
+
+    if (player.error) {
+
+        return createPlayerErrorHtml(
+            player,
+            position,
+            initials,
+            profileUrl
+        );
+    }
+
+
+    return `
+        <article class="player ${lastClass}">
 
             <div class="player-position">
-                ${position}
+                ${position}º
             </div>
 
             <div class="player-avatar">
@@ -495,23 +643,16 @@ function createPlayerHtml(
 
             <div class="player-info">
 
-                <div class="player-name-row">
+                ${createPlayerNameHtml(
+                    player,
+                    profileUrl
+                )}
 
-                    <span class="player-name">
-                        ${escapeHtml(player.name)}
-                    </span>
-
-                    <a
-                        class="profile-link"
-                        href="${profileUrl}"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        title="Abrir perfil no Codewars"
-                    >
-                        Perfil ↗
-                    </a>
-
-                </div>
+                ${
+                    isLast
+                        ? createDailyPenaltyBadgeHtml()
+                        : ""
+                }
 
                 <span class="player-kyu">
                     ${escapeHtml(player.kyu)}
@@ -526,7 +667,10 @@ function createPlayerHtml(
                         </strong>
                     </span>
 
-                    <span class="honor-divider">
+                    <span
+                        class="honor-divider"
+                        aria-hidden="true"
+                    >
                         •
                     </span>
 
@@ -557,25 +701,169 @@ function createPlayerHtml(
     `;
 }
 
-function renderHistory(history) {
 
-    if (
-        !history ||
-        history.length === 0
-    ) {
+function createPlayerErrorHtml(
+    player,
+    position,
+    initials,
+    profileUrl
+) {
 
-        historyElement.innerHTML =
-            `
-            <div class="empty-state">
-                Nenhuma temporada encerrada.
+    return `
+        <article class="player">
+
+            <div class="player-position">
+                ${position}º
             </div>
-            `;
+
+            <div class="player-avatar">
+                ${escapeHtml(initials)}
+            </div>
+
+            <div class="player-info">
+
+                ${createPlayerNameHtml(
+                    player,
+                    profileUrl
+                )}
+
+                <span class="player-error">
+                    Não foi possível consultar o Codewars
+                </span>
+
+            </div>
+
+            <div class="player-score">
+
+                <strong class="player-points">
+                    —
+                </strong>
+
+            </div>
+
+        </article>
+    `;
+}
+
+
+function createPlayerNameHtml(
+    player,
+    profileUrl
+) {
+
+    return `
+        <div class="player-name-row">
+
+            <span class="player-name">
+                ${escapeHtml(player.name)}
+            </span>
+
+            <a
+                class="profile-link"
+                href="${profileUrl}"
+                target="_blank"
+                rel="noopener noreferrer"
+                title="Abrir perfil no Codewars"
+            >
+                Perfil ↗
+            </a>
+
+        </div>
+    `;
+}
+
+
+function createDailyPenaltyBadgeHtml() {
+
+    return `
+        <div class="daily-penalty-badge">
+            PRÓXIMA DAILY É SUA
+        </div>
+    `;
+}
+
+function renderLeader(leader) {
+
+    elements.leaderName.textContent =
+        leader
+            ? leader.name
+            : "-";
+}
+
+
+function renderLastUpdate() {
+
+    elements.lastUpdate.textContent =
+        `Atualizado ${formatTime(new Date())}`;
+}
+
+function renderLastDailyLoser(history) {
+
+    const lastSeason =
+        history?.at(-1);
+
+
+    const loser =
+        lastSeason?.ranking?.at(-1);
+
+
+    if (!loser) {
+
+        elements.dailyPenaltyHistory.hidden =
+            true;
+
+        elements.dailyPenaltyHistory.innerHTML =
+            "";
 
         return;
     }
 
 
-    historyElement.innerHTML =
+    elements.dailyPenaltyHistory.hidden =
+        false;
+
+
+    elements.dailyPenaltyHistory.innerHTML = `
+        <div
+            class="daily-penalty-icon"
+            aria-hidden="true"
+        >
+            !
+        </div>
+
+        <div class="daily-penalty-history-info">
+
+            <span>
+                ÚLTIMO A PAGAR A PRENDA
+            </span>
+
+            <strong>
+                ${escapeHtml(loser.name)}
+            </strong>
+
+            <small>
+                Apresentou a daily por 1 semana
+            </small>
+
+        </div>
+    `;
+}
+
+function renderHistory(history) {
+
+    if (!history?.length) {
+
+        elements.historyList.innerHTML = `
+            <div class="empty-state">
+                Nenhuma temporada encerrada.
+            </div>
+        `;
+
+        return;
+    }
+
+
+    elements.historyList.innerHTML =
         history
             .slice()
             .reverse()
@@ -591,32 +879,7 @@ function createHistoryHtml(season) {
     const ranking =
         season.ranking
             .map(
-                (
-                    player,
-                    index
-                ) => {
-
-                    const position =
-                        ["🥇", "🥈", "🥉"][index]
-                        ?? `${index + 1}º`;
-
-
-                    return `
-                        <div class="history-player">
-
-                            <span>
-                                ${position}
-                                ${escapeHtml(player.name)}
-                            </span>
-
-                            <strong>
-                                ${formatNumber(player.points)}
-                                pts
-                            </strong>
-
-                        </div>
-                    `;
-                }
+                createHistoryPlayerHtml
             )
             .join("");
 
@@ -625,17 +888,21 @@ function createHistoryHtml(season) {
         <div class="history-item">
 
             <div class="history-title">
+
                 ${formatDate(
                     parseLocalDate(
                         season.startDate
                     )
                 )}
+
                 →
+
                 ${formatDate(
                     parseLocalDate(
                         season.endDate
                     )
                 )}
+
             </div>
 
             ${ranking}
@@ -645,30 +912,47 @@ function createHistoryHtml(season) {
 }
 
 
-function getInitials(name) {
+function createHistoryPlayerHtml(
+    player,
+    index
+) {
 
-    const words =
-        String(name)
-            .trim()
-            .split(/\s+/);
-
-
-    if (words.length === 1) {
-
-        return words[0]
-            .substring(0, 2)
-            .toUpperCase();
-    }
+    const medals = [
+        "🥇",
+        "🥈",
+        "🥉"
+    ];
 
 
-    return (
-        words[0][0] +
-        words[
-            words.length - 1
-        ][0]
-    ).toUpperCase();
+    const position =
+        medals[index]
+        ?? `${index + 1}º`;
+
+
+    return `
+        <div class="history-player">
+
+            <span>
+                ${position}
+                ${escapeHtml(player.name)}
+            </span>
+
+            <strong>
+                ${formatNumber(player.points)} pts
+            </strong>
+
+        </div>
+    `;
 }
 
+function getProfileUrl(username) {
+
+    return (
+        `${CODEWARS_PROFILE_URL}/${encodeURIComponent(
+            username
+        )}`
+    );
+}
 
 function getSeasonEndDate(startDate) {
 
@@ -708,16 +992,16 @@ function formatDaysLeft(endDate) {
     );
 
 
+    const millisecondsPerDay =
+        86400000;
+
+
     const days =
         Math.max(
             0,
             Math.ceil(
-                (
-                    target -
-                    today
-                )
-                /
-                86400000
+                (target - today) /
+                millisecondsPerDay
             )
         );
 
@@ -751,84 +1035,106 @@ function parseLocalDate(value) {
     );
 }
 
-
 function formatDate(date) {
 
-    return date
-        .toLocaleDateString(
-            "pt-BR",
-            {
-                day: "2-digit",
-                month: "2-digit"
-            }
-        );
+    return date.toLocaleDateString(
+        "pt-BR",
+        {
+            day:
+                "2-digit",
+
+            month:
+                "2-digit"
+        }
+    );
 }
 
 
 function formatTime(date) {
 
-    return date
-        .toLocaleTimeString(
-            "pt-BR",
-            {
-                hour: "2-digit",
-                minute: "2-digit"
-            }
-        );
+    return date.toLocaleTimeString(
+        "pt-BR",
+        {
+            hour:
+                "2-digit",
+
+            minute:
+                "2-digit"
+        }
+    );
 }
 
 
 function formatNumber(value) {
 
-    return Number(value)
-        .toLocaleString(
-            "pt-BR"
-        );
+    return Number(
+        value
+    ).toLocaleString(
+        "pt-BR"
+    );
 }
-
 
 function setLoading(isLoading) {
 
-    refreshButton.disabled =
+    elements.refreshButton.disabled =
         isLoading;
 
 
-    refreshButton.classList.toggle(
+    elements.refreshButton.classList.toggle(
         "loading",
         isLoading
     );
+}
+
+function getInitials(name) {
+
+    const words =
+        String(name)
+            .trim()
+            .split(/\s+/);
+
+
+    if (words.length === 1) {
+
+        return words[0]
+            .substring(0, 2)
+            .toUpperCase();
+    }
+
+
+    return (
+        words[0][0] +
+        words.at(-1)[0]
+    ).toUpperCase();
 }
 
 
 function escapeHtml(value) {
 
     return String(value)
-
         .replaceAll(
             "&",
             "&amp;"
         )
-
         .replaceAll(
             "<",
             "&lt;"
         )
-
         .replaceAll(
             ">",
             "&gt;"
         )
-
         .replaceAll(
             '"',
             "&quot;"
         )
-
         .replaceAll(
             "'",
             "&#039;"
         );
 }
 
+
+/* START */
 
 loadData();

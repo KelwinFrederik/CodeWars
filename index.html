@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
 
@@ -13,7 +14,10 @@
         content="Ranking mensal do clan BotosCodeWars"
     >
 
-    <meta name="theme-color" content="#0b0d12">
+    <meta
+        name="theme-color"
+        content="#0b0d12"
+    >
 
     <title>BotosCodeWars</title>
 
@@ -37,7 +41,10 @@
 
             <div class="brand-row">
 
-                <div class="brand-symbol">
+                <div
+                    class="brand-symbol"
+                    aria-hidden="true"
+                >
                     &lt;/&gt;
                 </div>
 
@@ -51,10 +58,10 @@
 
             </div>
 
-             <p>
+            <p>
                 Ranking mensal por Honor conquistado
             </p>
-            
+
             <a
                 class="codewars-button"
                 href="https://www.codewars.com/"
@@ -65,7 +72,6 @@
             </a>
 
         </header>
-
 
         <section class="season-card">
 
@@ -93,28 +99,40 @@
 
             </div>
 
-
             <div class="season-stats">
 
                 <div>
                     <span>Jogadores</span>
-                    <strong id="participants-count">-</strong>
+
+                    <strong id="participants-count">
+                        -
+                    </strong>
                 </div>
 
                 <div>
                     <span>Líder</span>
-                    <strong id="leader-name">-</strong>
+
+                    <strong id="leader-name">
+                        -
+                    </strong>
                 </div>
 
                 <div>
                     <span>Restam</span>
-                    <strong id="days-left">-</strong>
+
+                    <strong id="days-left">
+                        -
+                    </strong>
                 </div>
 
             </div>
 
         </section>
 
+
+        <!-- =========================
+             RANKING ATUAL
+        ========================== -->
 
         <section class="ranking-section">
 
@@ -135,26 +153,38 @@
 
             </div>
 
+
+            <!-- TOP 3 -->
+
             <div
                 id="podium"
                 class="podium"
                 aria-label="Pódio da temporada atual"
             ></div>
 
+
+            <!-- ÚLTIMO PERDEDOR -->
+
+            <div
+                id="daily-penalty-history"
+                class="daily-penalty-history"
+                hidden
+            ></div>
+
+
+            <!-- DEMAIS PARTICIPANTES -->
+
             <div
                 id="ranking"
                 class="ranking"
                 aria-live="polite"
             >
-
                 <div class="skeleton"></div>
                 <div class="skeleton"></div>
                 <div class="skeleton"></div>
-
             </div>
 
         </section>
-
 
         <section class="history-section">
 
@@ -163,6 +193,7 @@
                 class="history-toggle"
                 type="button"
                 aria-expanded="false"
+                aria-controls="history-content"
             >
 
                 <div>
@@ -173,25 +204,24 @@
                     <h2>Histórico</h2>
                 </div>
 
-                <span class="history-arrow">
+                <span
+                    class="history-arrow"
+                    aria-hidden="true"
+                >
                     ↓
                 </span>
 
             </button>
-
 
             <div
                 id="history-content"
                 class="history-content"
                 hidden
             >
-
                 <div id="history-list"></div>
-
             </div>
 
         </section>
-
 
         <footer>
             Honor atual − Honor inicial = pontos do mês
@@ -203,4 +233,5 @@
     <script src="app.js"></script>
 
 </body>
+
 </html>
