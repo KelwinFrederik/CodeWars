@@ -1,16 +1,26 @@
 {
   "current": {
-    "startDate": "2026-08-21",
+    "startDate": "2026-09-21",
     "participants": [
+      {
+        "name": "KelwinFrederik",
+        "codewarsUsername": "KelwinFrederik",
+        "initialHonor": 914
+      },
+      {
+        "name": "gabrielgoncalvesdev",
+        "codewarsUsername": "gabrielgoncalvesdev",
+        "initialHonor": 133
+      },
+      {
+        "name": "LorrayneAntonielle",
+        "codewarsUsername": "LorrayneAntonielle",
+        "initialHonor": 134
+      },
       {
         "name": "DaviBrum",
         "codewarsUsername": "DaviBrum",
         "initialHonor": 514
-      },
-      {
-        "name": "KelwinFrederik",
-        "codewarsUsername": "KelwinFrederik",
-        "initialHonor": 378
       },
       {
         "name": "IgorGrieder",
@@ -18,23 +28,12 @@
         "initialHonor": 311
       },
       {
-        "name": "LorrayneAntonielle",
-        "codewarsUsername": "LorrayneAntonielle",
-        "initialHonor": 132
-      },
-      {
         "name": "Iury Silva Taveira",
         "codewarsUsername": "Iury Silva Taveira",
         "initialHonor": 80
-      },
-      {
-        "name": "gabrielgoncalvesdev",
-        "codewarsUsername": "gabrielgoncalvesdev",
-        "initialHonor": 79
       }
     ]
   },
-
   "history": [
     {
       "startDate": "2026-08-01",
@@ -69,6 +68,42 @@
           "name": "gabrielgoncalvesdev",
           "username": "gabrielgoncalvesdev",
           "points": 79
+        }
+      ]
+    },
+    {
+      "startDate": "2026-08-21",
+      "endDate": "2026-09-20",
+      "ranking": [
+        {
+          "name": "KelwinFrederik",
+          "username": "KelwinFrederik",
+          "points": 536
+        },
+        {
+          "name": "gabrielgoncalvesdev",
+          "username": "gabrielgoncalvesdev",
+          "points": 54
+        },
+        {
+          "name": "LorrayneAntonielle",
+          "username": "LorrayneAntonielle",
+          "points": 2
+        },
+        {
+          "name": "DaviBrum",
+          "username": "DaviBrum",
+          "points": 0
+        },
+        {
+          "name": "IgorGrieder",
+          "username": "IgorGrieder",
+          "points": 0
+        },
+        {
+          "name": "Iury Silva Taveira",
+          "username": "Iury Silva Taveira",
+          "points": 0
         }
       ]
     }
