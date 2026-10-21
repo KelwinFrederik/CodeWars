@@ -1,11 +1,11 @@
 {
   "current": {
-    "startDate": "2026-09-21",
+    "startDate": "2026-10-21",
     "participants": [
       {
         "name": "KelwinFrederik",
         "codewarsUsername": "KelwinFrederik",
-        "initialHonor": 914
+        "initialHonor": 916
       },
       {
         "name": "gabrielgoncalvesdev",
@@ -89,6 +89,42 @@
           "name": "LorrayneAntonielle",
           "username": "LorrayneAntonielle",
           "points": 2
+        },
+        {
+          "name": "DaviBrum",
+          "username": "DaviBrum",
+          "points": 0
+        },
+        {
+          "name": "IgorGrieder",
+          "username": "IgorGrieder",
+          "points": 0
+        },
+        {
+          "name": "Iury Silva Taveira",
+          "username": "Iury Silva Taveira",
+          "points": 0
+        }
+      ]
+    },
+    {
+      "startDate": "2026-09-21",
+      "endDate": "2026-10-20",
+      "ranking": [
+        {
+          "name": "KelwinFrederik",
+          "username": "KelwinFrederik",
+          "points": 2
+        },
+        {
+          "name": "gabrielgoncalvesdev",
+          "username": "gabrielgoncalvesdev",
+          "points": 0
+        },
+        {
+          "name": "LorrayneAntonielle",
+          "username": "LorrayneAntonielle",
+          "points": 0
         },
         {
           "name": "DaviBrum",
